@@ -27,7 +27,7 @@ int distance_obstacle = 30; //distância para o robô parar e recalcular o melho
 int motor_speed_one = 250;
 int motor_speed_two = 250;
 
-int frequencia = 2000;
+int frequencia = 5000;
 int Pinofalante = 7;
 int atraso = 1000;
 
@@ -69,10 +69,10 @@ void loop() {
   }
   else if(distance_middle > 30 && distance_middle < 50){
     go_forward();
-    atraso = 700;
+    atraso = 2;
   }
   else if (distance_middle <= 30){
-    atraso = 300;
+    atraso = 100;
     pause();
     go_back();
     pause();
@@ -97,6 +97,8 @@ void loop() {
   Serial.print("Distance in CM direita: ");
   Serial.println(distance_right);
   NewTone(Pinofalante, frequencia, tempo);        
+  Serial.print("delay: ");
+  Serial.println(atraso);
   delay(atraso);
 }
 
@@ -128,7 +130,7 @@ digitalWrite(pino_in1, LOW);
 digitalWrite(pino_in2, LOW);
 digitalWrite(pino_in3, LOW);
 digitalWrite(pino_in4, LOW);
-delay(100);   //aguarda um tempo
+delay(1000);   //aguarda um tempo
 }
 void turn_right()
 {
