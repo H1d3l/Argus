@@ -1,4 +1,5 @@
 #include <Ultrasonic.h>
+#include <NewTone.h>
 
 #define pino_trigger_right 8
 #define pino_trigger_middle 12
@@ -15,6 +16,9 @@
 #define pino_in3 49 //pino in3 da ponte h l298
 #define pino_in4 48 //pino in4 da ponte h l298
 
+#define tempo 500
+
+
 Ultrasonic ultrasonic_middle(pino_trigger_middle,pino_echo_middle);//Inicializa o sensor nos pinos definidos acima
 Ultrasonic ultrasonic_left(pino_trigger_left,pino_echo_left);//Inicializa o sensor nos pinos definidos acima
 Ultrasonic ultrasonic_right(pino_trigger_right,pino_echo_right);//Inicializa o sensor nos pinos definidos acima
@@ -23,10 +27,15 @@ int distance_obstacle = 30; //distância para o robô parar e recalcular o melho
 int motor_speed_one = 250;
 int motor_speed_two = 250;
 
+int frequencia = 2000;
+int Pinofalante = 7;
+int atraso = 1000;
+
 void setup() {
      
   Serial.begin(9600);// inicializa a comunicação serial para mostrar dados
   pinMode(2, OUTPUT);  // define pino 2 como saida led
+  pinMode(Pinofalante,OUTPUT);
   pinMode(pino_enA, OUTPUT);
   pinMode(pino_enB, OUTPUT);
   pinMode(pino_in1, OUTPUT);
@@ -39,15 +48,35 @@ void setup() {
 
 
 void loop() {
-  turn_on_led();
 
   int distance_middle = read_ultrasonic_middle();
   int distance_left = read_ultrasonic_left();
   int distance_right = read_ultrasonic_right();
+  turn_on_led();
 
-  if (distance_middle >= 40){
+ 
+  if (distance_middle > 150){
     go_forward();
-  }else{
+    atraso = 2000;
+  }
+  else if(distance_middle > 100 && distance_middle < 150){
+    go_forward();
+    atraso = 1500;
+  }
+  else if(distance_middle > 50 && distance_middle < 100){
+    go_forward();
+    atraso = 1200;
+  }
+  else if(distance_middle > 30 && distance_middle < 50){
+    go_forward();
+    atraso = 700;
+  }
+  else if (distance_middle <= 30){
+    atraso = 300;
+    pause();
+    go_back();
+    pause();
+   
     if(distance_right > distance_left){
       turn_right();
     }
@@ -58,23 +87,25 @@ void loop() {
     else{
       return_back();
     }
+    
   }
-
-
+   
   Serial.print("Distance in CM meio: ");
   Serial.println(distance_middle);
   Serial.print("Distance in CM esquerda: ");
   Serial.println(distance_left);
   Serial.print("Distance in CM direita: ");
   Serial.println(distance_right);
-
+  NewTone(Pinofalante, frequencia, tempo);        
+  delay(atraso);
 }
+
 void go_forward()
 {
 Serial.println("indo para frente");
-digitalWrite(pino_in1, HIGH);//MOTOR ESQUERDO 
-digitalWrite(pino_in2, LOW);//MOTOR DIREITO
-digitalWrite(pino_in3, LOW);
+digitalWrite(pino_in1, LOW);//MOTOR ESQUERDO 
+digitalWrite(pino_in2, HIGH);
+digitalWrite(pino_in3, LOW);//MOTOR DIREITO
 digitalWrite(pino_in4, HIGH);
 analogWrite(pino_enA, motor_speed_one);              // Defina a velocidade do motor Um
 analogWrite(pino_enB, motor_speed_two);            // Defina a velocidade do motor Dois                         
